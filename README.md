@@ -76,23 +76,34 @@ Google ToDoリストから取得され、特定の「時間ブロック」に割
 ```PlainText
 src/
 ├── domain/            # 【コア・ドメイン層】外部依存（GoogleやReact）を持たないピュアなTypeScript
-│   ├── models/        # 独自の型定義
-│   │   ├── timeBlock.ts    # 7つのブロックの制約・最小時間の定義
-│   │   ├── task.ts         # プライベート/仕事用タスクのドメインモデル定義（表示フラグを内包）
-│   │   └── timeSchedule.ts # ライフスタイル設定（TimeSchedulePolicy）
+│   ├── value-objects/ # 不変・値で同一視される型
+│   │   ├── BlockId.ts
+│   │   ├── Duration.ts
+│   │   ├── TimeBlockSpec.ts
+│   │   ├── TimeRange.ts
+│   │   ├── DayAnchor.ts
+│   │   ├── AccountKind.ts
+│   │   └── LifestyleSettings.ts
+│   ├── entities/      # 同一性（ID）を持つドメインオブジェクト
+│   │   ├── ScheduledTimeBlock.ts
+│   │   ├── Task.ts
+│   │   └── ChronologicalDay.ts
 │   └── services/      # 純粋な計算・バリデーション関数
-│       ├── timelineCalculator.ts # 21時始まり（動的）・FOCUS TIME伸縮・土曜始まり週計算ロジック
-│       └── diagnostics.ts        # 社会的時差ぼけ・最小時間突破の診断│
+│       ├── TimelineCalculator.ts
+│       ├── TaskPlacementValidator.ts
+│       └── SocialJetLagDiagnostic.ts
 ├── infrastructure/    # 【インフラ層】Google APIと直接通信（マルチアカウント対応）
 │   ├── googleCalendarClient.ts
-│   └── googleTasksClient.ts      # プライベート・仕事用の2つのトークンを切り替えてリクエスト
+│   └── googleTasksClient.ts
 │
 ├── adapters/          # 【アダプター層】防腐層（Anti-Corruption Layer）
 │   └── mappers.ts     # Google Task(DTO) ⇄ ドメインモデル(Task) の双方向変換
 │
 └── presentation/      # 【UI表現層】Refine / React(Vue)
     ├── components/    # WORK_TIMEタスクのみをタイムボックスとして描画する、土曜始まりの変則週次グリッドUI
-        └── hooks/         # タスクのドラッグ＆ドロップ、APIへのCRUDトリガー
+    └── hooks/         # タスクのドラッグ＆ドロップ、APIへのCRUDトリガー
+
+tests/domain/          # ドメイン層の単体テスト（Vitest）
 ```
 
 
