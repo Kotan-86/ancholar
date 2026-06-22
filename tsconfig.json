@@ -8,7 +8,9 @@
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
-      "@domain/*": ["./src/domain/*"]
+      "@domain/*": ["./src/domain/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@application/*": ["./src/application/*"]
     },
     "types": ["node"],
     "skipLibCheck": true,
