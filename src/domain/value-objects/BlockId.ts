@@ -1,6 +1,4 @@
 // 仕様: README.md §① 7つの時間ブロック（Time Blocks）
-import { DomainError } from "../DomainError.js";
-
 export const BlockId = {
   DOWN_TIME: "DOWN_TIME",
   SLEEP_TIME: "SLEEP_TIME",
@@ -23,13 +21,22 @@ export const BLOCK_ORDER: readonly BlockId[] = [
   BlockId.FREE_TIME,
 ] as const;
 
-export function blockIdFromListName(listName: string): BlockId {
+export type ListNameMappingStatus = "UNKNOWN_LIST_NAME";
+
+export function tryBlockIdFromListName(
+  listName: string,
+): BlockId | ListNameMappingStatus {
   const normalized = listName.trim().replace(/\s+/g, "_").toUpperCase();
   const match = BLOCK_ORDER.find((id) => id === normalized);
   if (!match) {
-    throw new DomainError(`Unknown task list name: ${listName}`);
+    return "UNKNOWN_LIST_NAME";
   }
   return match;
+}
+
+export function blockIdFromListName(listName: string): BlockId {
+  const result = tryBlockIdFromListName(listName);
+  return result as BlockId;
 }
 
 export function listNameFromBlockId(blockId: BlockId): string {

@@ -1,5 +1,5 @@
 // 仕様: README.md ルール④ 防衛的タイムボックスとタスクの伸縮制御
-import { DomainError } from "../DomainError.js";
+export type TimeRangeStatus = "START_AFTER_END";
 
 export class TimeRange {
   private constructor(
@@ -7,11 +7,16 @@ export class TimeRange {
     readonly end: Date,
   ) {}
 
-  static of(start: Date, end: Date): TimeRange {
+  static tryOf(start: Date, end: Date): TimeRange | TimeRangeStatus {
     if (start.getTime() > end.getTime()) {
-      throw new DomainError("TimeRange start must be before or equal to end");
+      return "START_AFTER_END";
     }
     return new TimeRange(new Date(start.getTime()), new Date(end.getTime()));
+  }
+
+  static of(start: Date, end: Date): TimeRange {
+    const result = TimeRange.tryOf(start, end);
+    return result as TimeRange;
   }
 
   contains(instant: Date): boolean {

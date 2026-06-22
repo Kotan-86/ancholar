@@ -1,14 +1,14 @@
-// 仕様: README.md ルール④ / ルール①
+// 仕様: docs/error.md#4.1-ドメイン層（純粋な評価）
 import { describe, expect, it } from "vitest";
 import { AccountKind } from "@domain/value-objects/AccountKind.js";
 import { DayAnchor } from "@domain/value-objects/DayAnchor.js";
 import { TimeRange } from "@domain/value-objects/TimeRange.js";
 
 describe("TimeRange", () => {
-  it("start > end は例外", () => {
+  it("start > end は START_AFTER_END ステータス", () => {
     const start = new Date("2026-06-21T19:00:00");
     const end = new Date("2026-06-21T18:00:00");
-    expect(() => TimeRange.of(start, end)).toThrow("TimeRange start must be before or equal to end");
+    expect(TimeRange.tryOf(start, end)).toBe("START_AFTER_END");
   });
 
   it("contains で時刻包含を判定できる", () => {

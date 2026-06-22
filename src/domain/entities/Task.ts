@@ -1,25 +1,42 @@
 // 仕様: README.md §② タスク（Allocated Task）/ ルール③④
-import { DomainError } from "../DomainError.js";
 import { AccountKind } from "../value-objects/AccountKind.js";
-import { BlockId, blockIdFromListName } from "../value-objects/BlockId.js";
+import {
+  BlockId,
+  tryBlockIdFromListName,
+  type BlockId as BlockIdType,
+} from "../value-objects/BlockId.js";
 import { TimeRange } from "../value-objects/TimeRange.js";
 
 export type TaskProps = {
   id: string;
   title: string;
   description: string;
-  blockId: BlockId;
+  blockId: BlockIdType;
   accountKind: AccountKind;
   startTime: Date;
-  endTime?: Date;
+  endTime: Date | null;
   listName: string;
 };
+
+export type CreateWorkStatus =
+  | "VALID"
+  | "WRONG_BLOCK"
+  | "MISSING_END_TIME"
+  | "INVALID_LIST_NAME_MAPPING";
+
+export type CreatePrivateStatus =
+  | "VALID"
+  | "WRONG_BLOCK"
+  | "OUTSIDE_BLOCK_RANGE"
+  | "INVALID_LIST_NAME_MAPPING";
+
+export type WorkTimeBoundaryStatus = "VALID" | "EXCEEDS_HARD_CEILING";
 
 export class Task {
   readonly id: string;
   readonly title: string;
   readonly description: string;
-  readonly blockId: BlockId;
+  readonly blockId: BlockIdType;
   readonly accountKind: AccountKind;
   readonly startTime: Date;
   readonly endTime: Date | null;
@@ -29,7 +46,7 @@ export class Task {
     id: string;
     title: string;
     description: string;
-    blockId: BlockId;
+    blockId: BlockIdType;
     accountKind: AccountKind;
     startTime: Date;
     endTime: Date | null;
@@ -49,23 +66,33 @@ export class Task {
     return this.accountKind === AccountKind.Work && this.blockId === BlockId.WORK_TIME;
   }
 
+  static evaluateCreateWork(props: {
+    id: string;
+    title: string;
+    description: string;
+    blockId: BlockIdType;
+    startTime: Date;
+    endTime?: Date;
+    listName: string;
+  }): CreateWorkStatus {
+    if (props.blockId !== BlockId.WORK_TIME) {
+      return "WRONG_BLOCK";
+    }
+    if (!props.endTime) {
+      return "MISSING_END_TIME";
+    }
+    return evaluateListNameMapping(props.listName, props.blockId);
+  }
+
   static createWork(props: {
     id: string;
     title: string;
     description: string;
-    blockId: BlockId;
+    blockId: BlockIdType;
     startTime: Date;
     endTime: Date;
     listName: string;
   }): Task {
-    if (props.blockId !== BlockId.WORK_TIME) {
-      throw new DomainError("Work tasks must belong to WORK_TIME");
-    }
-    if (!props.endTime) {
-      throw new DomainError("Work tasks require endTime");
-    }
-    validateListNameMapping(props.listName, props.blockId);
-
     return new Task({
       ...props,
       accountKind: AccountKind.Work,
@@ -73,23 +100,33 @@ export class Task {
     });
   }
 
+  static evaluateCreatePrivate(props: {
+    id: string;
+    title: string;
+    description: string;
+    blockId: BlockIdType;
+    startTime: Date;
+    listName: string;
+    blockTimeRange: TimeRange;
+  }): CreatePrivateStatus {
+    if (props.blockId === BlockId.WORK_TIME) {
+      return "WRONG_BLOCK";
+    }
+    if (!props.blockTimeRange.contains(props.startTime)) {
+      return "OUTSIDE_BLOCK_RANGE";
+    }
+    return evaluateListNameMapping(props.listName, props.blockId);
+  }
+
   static createPrivate(props: {
     id: string;
     title: string;
     description: string;
-    blockId: BlockId;
+    blockId: BlockIdType;
     startTime: Date;
     listName: string;
     blockTimeRange: TimeRange;
   }): Task {
-    if (props.blockId === BlockId.WORK_TIME) {
-      throw new DomainError("Private tasks cannot belong to WORK_TIME");
-    }
-    if (!props.blockTimeRange.contains(props.startTime)) {
-      throw new DomainError("Private task startTime must be within block time range");
-    }
-    validateListNameMapping(props.listName, props.blockId);
-
     return new Task({
       id: props.id,
       title: props.title,
@@ -102,27 +139,32 @@ export class Task {
     });
   }
 
-  validateWithinWorkTimeBoundary(workTimeRange: TimeRange): void {
+  evaluateWithinWorkTimeBoundary(workTimeRange: TimeRange): WorkTimeBoundaryStatus {
     if (!this.endTime) {
-      return;
+      return "VALID";
     }
     if (this.endTime.getTime() > workTimeRange.end.getTime()) {
-      throw new DomainError("Work task exceeds WORK_TIME Hard Ceiling");
+      return "EXCEEDS_HARD_CEILING";
     }
     if (
       !workTimeRange.contains(this.startTime) ||
       !workTimeRange.contains(this.endTime)
     ) {
-      throw new DomainError("Work task must stay within WORK_TIME boundary");
+      return "EXCEEDS_HARD_CEILING";
     }
+    return "VALID";
   }
 }
 
-function validateListNameMapping(listName: string, blockId: BlockId): void {
-  const mapped = blockIdFromListName(listName);
-  if (mapped !== blockId) {
-    throw new DomainError(`List name ${listName} does not match blockId ${blockId}`);
+function evaluateListNameMapping(
+  listName: string,
+  blockId: BlockIdType,
+): "VALID" | "INVALID_LIST_NAME_MAPPING" {
+  const mapped = tryBlockIdFromListName(listName);
+  if (mapped === "UNKNOWN_LIST_NAME" || mapped !== blockId) {
+    return "INVALID_LIST_NAME_MAPPING";
   }
+  return "VALID";
 }
 
 export type { TaskProps };
