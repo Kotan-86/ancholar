@@ -6,7 +6,7 @@ const WARNING_THRESHOLD_MINUTES = 60;
 
 export type SocialJetLagResult = {
   midSleepTime: Date;
-  templateMidSleepTime: Date;
+  previousMidSleepTime: Date;
   deltaMinutes: number;
   hasWarning: boolean;
 };
@@ -14,23 +14,37 @@ export type SocialJetLagResult = {
 export class SocialJetLagDiagnostic {
   static diagnose(
     day: ChronologicalDay,
-    templateMidSleepTime: Date,
+    previousDay: ChronologicalDay,
   ): SocialJetLagResult {
-    const sleepBlock = day.getBlock(BlockId.SLEEP_TIME);
-    const bedtime = sleepBlock.timeRange.start;
-    const wakeTime = sleepBlock.timeRange.end;
-    const sleepDurationMs = wakeTime.getTime() - bedtime.getTime();
-    const midSleepTime = new Date(bedtime.getTime() + sleepDurationMs / 2);
+    const midSleepTime = this.computeMidSleepTime(day);
+    const previousMidSleepTime = this.computeMidSleepTime(previousDay);
 
-    const deltaMinutes = Math.abs(
-      (midSleepTime.getTime() - templateMidSleepTime.getTime()) / (60 * 1000),
+    const deltaMinutes = circularTimeDeltaMinutes(
+      midSleepTime,
+      previousMidSleepTime,
     );
 
     return {
       midSleepTime,
-      templateMidSleepTime,
+      previousMidSleepTime,
       deltaMinutes,
       hasWarning: deltaMinutes >= WARNING_THRESHOLD_MINUTES,
     };
   }
+
+  private static computeMidSleepTime(day: ChronologicalDay): Date {
+    const sleepBlock = day.getBlock(BlockId.SLEEP_TIME);
+    const bedtime = sleepBlock.timeRange.start;
+    const wakeTime = sleepBlock.timeRange.end;
+    const sleepDurationMs = wakeTime.getTime() - bedtime.getTime();
+    return new Date(bedtime.getTime() + sleepDurationMs / 2);
+  }
+}
+
+function circularTimeDeltaMinutes(a: Date, b: Date): number {
+  const minutesInDay = 24 * 60;
+  const aMinutes = a.getHours() * 60 + a.getMinutes();
+  const bMinutes = b.getHours() * 60 + b.getMinutes();
+  const diff = Math.abs(aMinutes - bMinutes);
+  return Math.min(diff, minutesInDay - diff);
 }
