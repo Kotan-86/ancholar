@@ -1,4 +1,4 @@
-// 仕様: README.md §② / ルール③④
+// 仕様: docs/error.md#4.1-ドメイン層（純粋な評価）
 import { describe, expect, it } from "vitest";
 import { Task } from "@domain/entities/Task.js";
 import { BlockId } from "@domain/value-objects/BlockId.js";
@@ -11,8 +11,8 @@ describe("Task", () => {
   );
 
   it("Work + WORK_TIME: endTime 必須", () => {
-    expect(() =>
-      Task.createWork({
+    expect(
+      Task.evaluateCreateWork({
         id: "1",
         title: "Research",
         description: "",
@@ -21,7 +21,7 @@ describe("Task", () => {
         endTime: new Date("2026-06-22T10:00:00"),
         listName: "WORK TIME",
       }),
-    ).not.toThrow();
+    ).toBe("VALID");
   });
 
   it("Work + WORK_TIME: shouldPlotOnGrid === true", () => {
@@ -70,8 +70,8 @@ describe("Task", () => {
   });
 
   it("Private: startTime が Block 有効枠外なら拒否", () => {
-    expect(() =>
-      Task.createPrivate({
+    expect(
+      Task.evaluateCreatePrivate({
         id: "2",
         title: "Bath",
         description: "",
@@ -83,7 +83,7 @@ describe("Task", () => {
           new Date("2026-06-22T21:00:00"),
         ),
       }),
-    ).toThrow("Private task startTime must be within block time range");
+    ).toBe("OUTSIDE_BLOCK_RANGE");
   });
 
   it("Work: タスク endTime が WORK_TIME 終了を超えると拒否", () => {
@@ -96,7 +96,7 @@ describe("Task", () => {
       endTime: new Date("2026-06-22T16:00:00"),
       listName: "WORK TIME",
     });
-    expect(() => task.validateWithinWorkTimeBoundary(workRange)).not.toThrow();
+    expect(task.evaluateWithinWorkTimeBoundary(workRange)).toBe("VALID");
 
     const overTask = Task.createWork({
       id: "2",
@@ -107,14 +107,12 @@ describe("Task", () => {
       endTime: new Date("2026-06-22T18:00:00"),
       listName: "WORK TIME",
     });
-    expect(() => overTask.validateWithinWorkTimeBoundary(workRange)).toThrow(
-      "Work task exceeds WORK_TIME Hard Ceiling",
-    );
+    expect(overTask.evaluateWithinWorkTimeBoundary(workRange)).toBe("EXCEEDS_HARD_CEILING");
   });
 
   it("blockId と listName の一致（ルール③）", () => {
-    expect(() =>
-      Task.createWork({
+    expect(
+      Task.evaluateCreateWork({
         id: "1",
         title: "Research",
         description: "",
@@ -123,6 +121,6 @@ describe("Task", () => {
         endTime: new Date("2026-06-22T10:00:00"),
         listName: "FREE TIME",
       }),
-    ).toThrow("List name FREE TIME does not match blockId WORK_TIME");
+    ).toBe("INVALID_LIST_NAME_MAPPING");
   });
 });

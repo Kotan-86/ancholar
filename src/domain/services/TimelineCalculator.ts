@@ -3,14 +3,12 @@ import { ChronologicalDay } from "../entities/ChronologicalDay.js";
 import { ScheduledTimeBlock } from "../entities/ScheduledTimeBlock.js";
 import { BlockId } from "../value-objects/BlockId.js";
 import { DayAnchor } from "../value-objects/DayAnchor.js";
-import { Duration } from "../value-objects/Duration.js";
 import {
   DEFAULT_LIFESTYLE_SETTINGS,
   type LifestyleSettings,
 } from "../value-objects/LifestyleSettings.js";
 import { getTimeBlockSpec } from "../value-objects/TimeBlockSpec.js";
 import { TimeRange } from "../value-objects/TimeRange.js";
-import { DomainError } from "../DomainError.js";
 
 const FOCUS_FLOOR_MINUTES = 10;
 const DAY_TARGET_MINUTES = 23 * 60;
@@ -122,12 +120,6 @@ export class TimelineCalculator {
 
     const dayEnd = addMinutes(anchor.value, DAY_TARGET_MINUTES);
     const freeEnd = dayEnd;
-    const freeDurationMinutes = (freeEnd.getTime() - cursor.getTime()) / (60 * 1000);
-    if (freeDurationMinutes < 30) {
-      throw new DomainError(
-        `FREE_TIME duration ${freeDurationMinutes} is below floor after timeline calculation`,
-      );
-    }
     const free = ScheduledTimeBlock.create(
       BlockId.FREE_TIME,
       TimeRange.of(cursor, freeEnd),

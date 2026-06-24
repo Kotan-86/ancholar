@@ -1,10 +1,10 @@
-// 仕様: README.md §① 7つの時間ブロック（Time Blocks）
+// 仕様: docs/error.md#4.1-ドメイン層（純粋な評価）
 import { describe, expect, it } from "vitest";
 import { Duration } from "@domain/value-objects/Duration.js";
 
 describe("Duration", () => {
-  it("負数は例外", () => {
-    expect(() => Duration.fromMinutes(-1)).toThrow("Duration must be non-negative");
+  it("負数は NEGATIVE ステータス", () => {
+    expect(Duration.tryFromMinutes(-1)).toBe("NEGATIVE");
   });
 
   it("加算できる", () => {

@@ -1,13 +1,17 @@
 // 仕様: README.md §① 7つの時間ブロック（Time Blocks）
-import { DomainError } from "../DomainError.js";
+export type DurationStatus = "NEGATIVE";
 
 export class Duration {
   private constructor(readonly minutes: number) {}
 
-  static fromMinutes(minutes: number): Duration {
+  static tryFromMinutes(minutes: number): Duration | DurationStatus {
     if (minutes < 0) {
-      throw new DomainError("Duration must be non-negative");
+      return "NEGATIVE";
     }
+    return new Duration(minutes);
+  }
+
+  static fromMinutes(minutes: number): Duration {
     return new Duration(minutes);
   }
 
