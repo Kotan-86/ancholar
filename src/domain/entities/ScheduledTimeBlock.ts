@@ -58,6 +58,12 @@ export class ScheduledTimeBlock {
     this.range = this.range.withEnd(newEnd);
   }
 
+  /** UC-2: 検証済み前提で不変更新した新インスタンスを返す */
+  withResizedDuration(newDuration: Duration, _reason: ResizeReason): ScheduledTimeBlock {
+    const newEnd = new Date(this.range.start.getTime() + newDuration.minutes * 60 * 1000);
+    return new ScheduledTimeBlock(this.blockId, this.range.withEnd(newEnd));
+  }
+
   shiftEndTo(newEnd: Date): void {
     const newDuration = Duration.fromMinutes(
       (newEnd.getTime() - this.range.start.getTime()) / (60 * 1000),
