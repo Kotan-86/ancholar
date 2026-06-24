@@ -66,7 +66,8 @@ export class ChangeTimeBoxDurationUseCase {
         return err(updateResult.error);
       }
 
-      return ok(TimelineMapper.toDTO(day));
+      const updatedDay = day.withUpdatedTask(input.targetId, input.newStart, input.newEnd);
+      return ok(TimelineMapper.toDTO(updatedDay));
     }
 
     const blockId = input.targetId as BlockId;
@@ -95,8 +96,6 @@ export class ChangeTimeBoxDurationUseCase {
       });
     }
 
-    block.applyResize(newDuration, reason);
-
     const updateResult = await this.googleGateway.updateBlockTime(
       input.targetId,
       input.newStart,
@@ -106,6 +105,7 @@ export class ChangeTimeBoxDurationUseCase {
       return err(updateResult.error);
     }
 
-    return ok(TimelineMapper.toDTO(day));
+    const updatedDay = day.withUpdatedBlock(blockId, newDuration, reason);
+    return ok(TimelineMapper.toDTO(updatedDay));
   }
 }

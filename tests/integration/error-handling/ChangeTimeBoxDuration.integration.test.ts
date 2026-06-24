@@ -10,11 +10,17 @@ import { buildWorkTask } from "../../helpers/buildWorkTask.js";
 
 function createMocks() {
   const timelineRepo: TimelineRepository = {
+    getLifestyleSettings: vi.fn(),
+    getDownTimeStart: vi.fn(),
+    getTasksForDay: vi.fn(),
+    getEventsForDay: vi.fn(),
     getChronologicalDay: vi.fn(),
   };
   const googleGateway: GoogleGateway = {
     updateTaskTime: vi.fn(),
     updateBlockTime: vi.fn(),
+    createTask: vi.fn(),
+    createEvent: vi.fn(),
   };
   return { timelineRepo, googleGateway };
 }

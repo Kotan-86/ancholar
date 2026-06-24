@@ -10,7 +10,8 @@
     "paths": {
       "@domain/*": ["./src/domain/*"],
       "@shared/*": ["./src/shared/*"],
-      "@application/*": ["./src/application/*"]
+      "@application/*": ["./src/application/*"],
+      "@infrastructure/*": ["./src/infrastructure/*"]
     },
     "types": ["node"],
     "skipLibCheck": true,

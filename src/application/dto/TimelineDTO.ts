@@ -1,9 +1,12 @@
 // 仕様: docs/application/usecase.md#3-アプリケーション層の入出力データ定義（dto）
+import type { ViolationAlert } from "./ViolationAlert.js";
+
 export type TimelineDTO = {
   anchorDate: Date;
   totalDurationMinutes: number;
   blocks: BlockDTO[];
   socialJetLagWarning: boolean;
+  violations?: ViolationAlert[];
 };
 
 export type BlockDTO = {

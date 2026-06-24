@@ -10,11 +10,17 @@ import { buildWorkTask } from "../../helpers/buildWorkTask.js";
 
 function createMocks() {
   const timelineRepo: TimelineRepository = {
+    getLifestyleSettings: vi.fn(),
+    getDownTimeStart: vi.fn(),
+    getTasksForDay: vi.fn(),
+    getEventsForDay: vi.fn(),
     getChronologicalDay: vi.fn(),
   };
   const googleGateway: GoogleGateway = {
     updateTaskTime: vi.fn(),
     updateBlockTime: vi.fn(),
+    createTask: vi.fn(),
+    createEvent: vi.fn(),
   };
   return { timelineRepo, googleGateway };
 }
@@ -225,6 +231,10 @@ describe("ChangeTimeBoxDurationUseCase", () => {
         isDurationFixed: expect.any(Boolean),
         tasks: expect.any(Array),
       });
+      const workBlock = result.value.blocks.find((b) => b.blockId === BlockId.WORK_TIME);
+      const taskDto = workBlock?.tasks.find((t) => t.id === "task-1");
+      expect(taskDto?.startTime).toEqual(new Date("2026-06-22T09:30:00"));
+      expect(taskDto?.endTime).toEqual(new Date("2026-06-22T10:30:00"));
     }
     expect(googleGateway.updateTaskTime).toHaveBeenCalledOnce();
   });

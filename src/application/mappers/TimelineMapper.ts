@@ -2,10 +2,15 @@
 import type { ChronologicalDay } from "@domain/entities/ChronologicalDay.js";
 import { AccountKind } from "@domain/value-objects/AccountKind.js";
 import { getTimeBlockSpec } from "@domain/value-objects/TimeBlockSpec.js";
+import type { ViolationAlert } from "../dto/ViolationAlert.js";
 import type { BlockDTO, TaskDTO, TimelineDTO } from "../dto/TimelineDTO.js";
 
 export class TimelineMapper {
-  static toDTO(day: ChronologicalDay, socialJetLagWarning = false): TimelineDTO {
+  static toDTO(
+    day: ChronologicalDay,
+    socialJetLagWarning = false,
+    violations?: ViolationAlert[],
+  ): TimelineDTO {
     const tasksByBlock = new Map<string, TaskDTO[]>();
     for (const block of day.blocks) {
       tasksByBlock.set(block.blockId, []);
@@ -41,6 +46,7 @@ export class TimelineMapper {
       totalDurationMinutes: day.totalDuration().minutes,
       blocks,
       socialJetLagWarning,
+      ...(violations && violations.length > 0 ? { violations } : {}),
     };
   }
 }
