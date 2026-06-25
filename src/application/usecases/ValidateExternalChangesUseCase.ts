@@ -3,12 +3,12 @@ import { ViolationCollector } from "@domain/services/ViolationCollector.js";
 import { AccountKind } from "@domain/value-objects/AccountKind.js";
 import { BlockId, blockIdFromListName } from "@domain/value-objects/BlockId.js";
 import { err, ok, type Result } from "@shared/Result.js";
-import type { ExternalChangeDTO } from "../dto/ExternalChangeDTO.js";
-import type { ValidateExternalChangesInput } from "../dto/ValidateExternalChangesInput.js";
-import type { ViolationAlert } from "../dto/ViolationAlert.js";
-import type { UseCaseError } from "../errors/AppErrors.js";
-import { ViolationAlertMapper } from "../mappers/ViolationAlertMapper.js";
-import type { ExternalChangeRepository } from "../ports/ExternalChangeRepository.js";
+import type { ExternalChangeDTO } from "@interface/response/ExternalChangeDTO.js";
+import type { ValidateExternalChangesInput } from "@interface/request/ValidateExternalChangesInput.js";
+import type { ViolationAlert } from "@interface/response/ViolationAlert.js";
+import type { UseCaseError } from "@interface/errors/UseCaseError.js";
+import { ViolationAlertMapper } from "@interface/mappers/ViolationAlertMapper.js";
+import type { ExternalChangeRepository } from "@interface/ports/ExternalChangeRepository.js";
 import { DayAssemblyService } from "../services/DayAssemblyService.js";
 
 export class ValidateExternalChangesUseCase {

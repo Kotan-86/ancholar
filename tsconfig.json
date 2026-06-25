@@ -11,7 +11,8 @@
       "@domain/*": ["./src/domain/*"],
       "@shared/*": ["./src/shared/*"],
       "@application/*": ["./src/application/*"],
-      "@infrastructure/*": ["./src/infrastructure/*"]
+      "@interface/*": ["./src/interface/*"],
+      "@frameworks-drivers/*": ["./src/frameworks-drivers/*"]
     },
     "types": ["node"],
     "skipLibCheck": true,

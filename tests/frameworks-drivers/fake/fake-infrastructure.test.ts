@@ -3,12 +3,12 @@ import { describe, expect, it } from "vitest";
 import { AccountKind } from "@domain/value-objects/AccountKind.js";
 import { BlockId } from "@domain/value-objects/BlockId.js";
 import { DEFAULT_LIFESTYLE_SETTINGS } from "@domain/value-objects/LifestyleSettings.js";
-import { FakeTimelineRepository } from "@infrastructure/fake/FakeTimelineRepository.js";
-import { FakeGoogleGateway } from "@infrastructure/fake/FakeGoogleGateway.js";
+import { FakeTimelineRepository } from "@frameworks-drivers/fake/FakeTimelineRepository.js";
+import { FakeGoogleGateway } from "@frameworks-drivers/fake/FakeGoogleGateway.js";
 import {
   FakeExternalChangeRepository,
   type FakeExternalChange,
-} from "@infrastructure/fake/FakeExternalChangeRepository.js";
+} from "@frameworks-drivers/fake/FakeExternalChangeRepository.js";
 import { buildValidDay } from "../../helpers/buildValidDay.js";
 import { buildWorkTask } from "../../helpers/buildWorkTask.js";
 

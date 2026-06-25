@@ -4,12 +4,12 @@ import { BlockId } from "@domain/value-objects/BlockId.js";
 import { Duration } from "@domain/value-objects/Duration.js";
 import { TaskPlacementValidator } from "@domain/services/TaskPlacementValidator.js";
 import { err, ok, type Result } from "@shared/Result.js";
-import type { ChangeTimeBoxDurationInput } from "../dto/ChangeTimeBoxDurationInput.js";
-import type { TimelineDTO } from "../dto/TimelineDTO.js";
-import type { UseCaseError } from "../errors/AppErrors.js";
-import { TimelineMapper } from "../mappers/TimelineMapper.js";
-import type { GoogleGateway } from "../ports/GoogleGateway.js";
-import type { TimelineRepository } from "../ports/TimelineRepository.js";
+import type { ChangeTimeBoxDurationInput } from "@interface/request/ChangeTimeBoxDurationInput.js";
+import type { TimelineDTO } from "@interface/response/TimelineDTO.js";
+import type { UseCaseError } from "@interface/errors/UseCaseError.js";
+import { TimelineMapper } from "@interface/mappers/TimelineMapper.js";
+import type { GoogleGateway } from "@interface/ports/GoogleGateway.js";
+import type { TimelineRepository } from "@interface/ports/TimelineRepository.js";
 
 export class ChangeTimeBoxDurationUseCase {
   constructor(

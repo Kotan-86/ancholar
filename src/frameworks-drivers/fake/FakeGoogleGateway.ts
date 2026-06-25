@@ -4,9 +4,9 @@ import type { BlockId } from "@domain/value-objects/BlockId.js";
 import type {
   CreatedEventRecord,
   CreatedTaskRecord,
-} from "@application/dto/ExternalRecords.js";
-import type { GoogleGateway } from "@application/ports/GoogleGateway.js";
-import type { UseCaseError } from "@application/errors/AppErrors.js";
+} from "@interface/records/ExternalRecords.js";
+import type { GoogleGateway } from "@interface/ports/GoogleGateway.js";
+import type { UseCaseError } from "@interface/errors/UseCaseError.js";
 import { err, ok, type Result } from "@shared/Result.js";
 
 export type UpdateTaskTimeCall = {

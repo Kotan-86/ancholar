@@ -2,8 +2,8 @@
 import type { ChronologicalDay } from "@domain/entities/ChronologicalDay.js";
 import { AccountKind } from "@domain/value-objects/AccountKind.js";
 import { getTimeBlockSpec } from "@domain/value-objects/TimeBlockSpec.js";
-import type { ViolationAlert } from "../dto/ViolationAlert.js";
-import type { BlockDTO, TaskDTO, TimelineDTO } from "../dto/TimelineDTO.js";
+import type { ViolationAlert } from "../response/ViolationAlert.js";
+import type { BlockDTO, TaskDTO, TimelineDTO } from "../response/TimelineDTO.js";
 
 export class TimelineMapper {
   static toDTO(

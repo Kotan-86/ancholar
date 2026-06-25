@@ -1,4 +1,4 @@
-// 仕様: docs/error.md#3-アプリケーションエラーの型定義
+// 仕様: docs/error.md#3-ユースケースエラーの型定義
 export type RuleViolationError = {
   readonly type: "HardCeilingExceeded" | "FloorConstraintBroken" | "InvalidTaskMapping";
   readonly message: string;

@@ -3,7 +3,7 @@ import {
   FakeExternalChangeRepository,
   type FakeExternalChange,
   type FakeExternalChangeRepositoryOptions,
-} from "@infrastructure/fake/FakeExternalChangeRepository.js";
+} from "@frameworks-drivers/fake/FakeExternalChangeRepository.js";
 
 export type { FakeExternalChange, FakeExternalChangeRepositoryOptions };
 

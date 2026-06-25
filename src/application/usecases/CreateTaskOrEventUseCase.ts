@@ -4,10 +4,10 @@ import { Task } from "@domain/entities/Task.js";
 import { AccountKind } from "@domain/value-objects/AccountKind.js";
 import { BlockId, listNameFromBlockId } from "@domain/value-objects/BlockId.js";
 import { err, ok, type Result } from "@shared/Result.js";
-import type { CreateTaskOrEventInput } from "../dto/CreateTaskOrEventInput.js";
-import type { CreatedTaskDTO } from "../dto/CreatedTaskDTO.js";
-import type { UseCaseError } from "../errors/AppErrors.js";
-import type { GoogleGateway } from "../ports/GoogleGateway.js";
+import type { CreateTaskOrEventInput } from "@interface/request/CreateTaskOrEventInput.js";
+import type { CreatedTaskDTO } from "@interface/response/CreatedTaskDTO.js";
+import type { UseCaseError } from "@interface/errors/UseCaseError.js";
+import type { GoogleGateway } from "@interface/ports/GoogleGateway.js";
 import { DayAssemblyService } from "../services/DayAssemblyService.js";
 
 export class CreateTaskOrEventUseCase {

@@ -2,7 +2,7 @@
 import {
   FakeGoogleGateway,
   type FakeGoogleGatewayOptions,
-} from "@infrastructure/fake/FakeGoogleGateway.js";
+} from "@frameworks-drivers/fake/FakeGoogleGateway.js";
 
 export type { FakeGoogleGatewayOptions };
 

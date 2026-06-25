@@ -10,7 +10,8 @@ export default defineConfig({
       "@domain": path.resolve(__dirname, "src/domain"),
       "@shared": path.resolve(__dirname, "src/shared"),
       "@application": path.resolve(__dirname, "src/application"),
-      "@infrastructure": path.resolve(__dirname, "src/infrastructure"),
+      "@interface": path.resolve(__dirname, "src/interface"),
+      "@frameworks-drivers": path.resolve(__dirname, "src/frameworks-drivers"),
     },
   },
 });

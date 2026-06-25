@@ -75,36 +75,86 @@ Google ToDoリストから取得され、特定の「時間ブロック」に割
 
 ```PlainText
 src/
-├── domain/            # 【コア・ドメイン層】外部依存（GoogleやReact）を持たないピュアなTypeScript
-│   ├── value-objects/ # 不変・値で同一視される型
-│   │   ├── BlockId.ts
-│   │   ├── Duration.ts
-│   │   ├── TimeBlockSpec.ts
-│   │   ├── TimeRange.ts
-│   │   ├── DayAnchor.ts
+├── domain/                 # 【ドメイン層】外部依存を持たないピュアな TypeScript
+│   ├── value-objects/
 │   │   ├── AccountKind.ts
-│   │   └── LifestyleSettings.ts
-│   ├── entities/      # 同一性（ID）を持つドメインオブジェクト
+│   │   ├── BlockId.ts
+│   │   ├── DayAnchor.ts
+│   │   ├── Duration.ts
+│   │   ├── LifestyleSettings.ts
+│   │   ├── TimeBlockSpec.ts
+│   │   └── TimeRange.ts
+│   ├── entities/
+│   │   ├── ChronologicalDay.ts
 │   │   ├── ScheduledTimeBlock.ts
-│   │   ├── Task.ts
-│   │   └── ChronologicalDay.ts
-│   └── services/      # 純粋な計算・バリデーション関数
-│       ├── TimelineCalculator.ts
+│   │   └── Task.ts
+│   └── services/
+│       ├── SocialJetLagDiagnostic.ts
 │       ├── TaskPlacementValidator.ts
-│       └── SocialJetLagDiagnostic.ts
-├── infrastructure/    # 【インフラ層】Google APIと直接通信（マルチアカウント対応）
-│   ├── googleCalendarClient.ts
-│   └── googleTasksClient.ts
+│       ├── TimelineCalculator.ts
+│       └── ViolationCollector.ts
 │
-├── adapters/          # 【アダプター層】防腐層（Anti-Corruption Layer）
-│   └── mappers.ts     # Google Task(DTO) ⇄ ドメインモデル(Task) の双方向変換
+├── application/            # 【アプリケーション層】ユースケースのオーケストレーション
+│   ├── usecases/
+│   │   ├── ChangeTimeBoxDurationUseCase.ts
+│   │   ├── CreateTaskOrEventUseCase.ts
+│   │   ├── GetDailyTimelineUseCase.ts
+│   │   ├── ValidateExternalChangesUseCase.ts
+│   │   └── ValidateNextDaySocialJetLagUseCase.ts
+│   └── services/
+│       ├── DayAssemblyService.ts
+│       ├── SocialJetLagEvaluationService.ts
+│       └── TimelineEnrichmentService.ts
 │
-└── presentation/      # 【UI表現層】Refine / React(Vue)
-    ├── components/    # WORK_TIMEタスクのみをタイムボックスとして描画する、土曜始まりの変則週次グリッドUI
-    └── hooks/         # タスクのドラッグ＆ドロップ、APIへのCRUDトリガー
+├── interface/              # 【インターフェイス層】ユースケース境界の入出力と Port 契約
+│   ├── request/            # ユースケース入力（Presentation → UseCase）
+│   ├── response/           # ユースケース出力（UseCase → Presentation）
+│   ├── records/            # Port 境界のデータ型（Frameworks & Drivers ↔ Application）
+│   ├── ports/              # 外部リソースへの契約
+│   ├── mappers/            # ドメイン ⇄ Response の変換
+│   └── errors/
+│       └── UseCaseError.ts
+│
+├── frameworks-drivers/   # 【フレームワーク&ドライバー層】Port の具象実装・外部 API 通信
+│   ├── google/             # （未実装）Google API クライアント
+│   │   ├── googleCalendarClient.ts
+│   │   └── googleTasksClient.ts
+│   ├── mappers/            # （未実装）Google API DTO ⇄ records の防腐層
+│   └── fake/               # テスト・開発用 Fake 実装
+│       ├── FakeExternalChangeRepository.ts
+│       ├── FakeGoogleGateway.ts
+│       └── FakeTimelineRepository.ts
+│
+├── presentation/           # 【UI 層】（未実装）Refine / React
+│   ├── components/
+│   └── hooks/
+│
+└── shared/                 # 【共有カーネル】層横断の汎用型
+    └── Result.ts
 
-tests/domain/          # ドメイン層の単体テスト（Vitest）
+tests/
+├── domain/
+├── application/
+├── frameworks-drivers/
+├── integration/
+└── helpers/
 ```
+
+### 依存方向
+
+外側の層から内側の層へだけ依存する。例外は認めない。
+
+```
+presentation → interface → application → domain
+frameworks-drivers → interface → domain
+shared ← （domain / application / interface / frameworks-drivers / presentation）
+```
+
+- `domain` は他の層に依存しない
+- `application` は `domain`・`interface`・`shared` のみに依存する
+- `interface` は `domain`・`shared` のみに依存する
+- `frameworks-drivers` は `interface`・`domain`・`shared` に依存する（Port を実装）
+- 例外は `frameworks-drivers` 最外縁で `Result` に変換し、内側へ伝播しない（`docs/error.md` 参照）
 
 
 ## プラットフォーム ＆ 外部連携要件

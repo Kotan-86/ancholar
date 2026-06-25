@@ -1,7 +1,7 @@
 // 仕様: docs/application/usecase.md#UC-3
-import type { ExternalChangeDTO } from "@application/dto/ExternalChangeDTO.js";
-import type { ExternalChangeRepository } from "@application/ports/ExternalChangeRepository.js";
-import type { UseCaseError } from "@application/errors/AppErrors.js";
+import type { ExternalChangeDTO } from "@interface/response/ExternalChangeDTO.js";
+import type { ExternalChangeRepository } from "@interface/ports/ExternalChangeRepository.js";
+import type { UseCaseError } from "@interface/errors/UseCaseError.js";
 import { err, ok, type Result } from "@shared/Result.js";
 
 export type FakeExternalChange = ExternalChangeDTO & {
