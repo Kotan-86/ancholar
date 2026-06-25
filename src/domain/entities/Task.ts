@@ -166,5 +166,3 @@ function evaluateListNameMapping(
   }
   return "VALID";
 }
-
-export type { TaskProps };
