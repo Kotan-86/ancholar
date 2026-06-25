@@ -3,6 +3,7 @@ import { Task } from "@domain/entities/Task.js";
 import { TimelineCalculator } from "@domain/services/TimelineCalculator.js";
 import {
   ViolationCollector,
+  type TaskPlacementInput,
   type TaskPlacementStatus,
   type ViolationFinding,
 } from "@domain/services/ViolationCollector.js";
@@ -10,9 +11,9 @@ import type { ChronologicalDay } from "@domain/entities/ChronologicalDay.js";
 import { AccountKind } from "@domain/value-objects/AccountKind.js";
 import { listNameFromBlockId } from "@domain/value-objects/BlockId.js";
 import { err, ok, type Result } from "@shared/Result.js";
-import type { ExternalEventRecord, ExternalTaskRecord } from "../dto/ExternalRecords.js";
-import type { UseCaseError } from "../errors/AppErrors.js";
-import type { TimelineRepository } from "../ports/TimelineRepository.js";
+import type { ExternalEventRecord, ExternalTaskRecord } from "@interface/records/ExternalRecords.js";
+import type { UseCaseError } from "@interface/errors/UseCaseError.js";
+import type { TimelineRepository } from "@interface/ports/TimelineRepository.js";
 
 export type LenientAssemblyResult = {
   day: ChronologicalDay;
@@ -128,7 +129,7 @@ export class DayAssemblyService {
     return ok({ day, skippedViolations });
   }
 
-  private static toPlacementInput(record: ExternalTaskRecord) {
+  private static toPlacementInput(record: ExternalTaskRecord): TaskPlacementInput {
     return {
       id: record.id,
       title: record.title,
@@ -136,7 +137,7 @@ export class DayAssemblyService {
       blockId: record.blockId,
       accountKind: record.accountKind,
       startTime: record.startTime,
-      endTime: record.endTime,
+      ...(record.endTime !== undefined ? { endTime: record.endTime } : {}),
     };
   }
 

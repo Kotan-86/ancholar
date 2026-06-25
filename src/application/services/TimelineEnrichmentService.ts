@@ -2,9 +2,9 @@
 import { ViolationCollector } from "@domain/services/ViolationCollector.js";
 import type { ChronologicalDay } from "@domain/entities/ChronologicalDay.js";
 import { err, ok, type Result } from "@shared/Result.js";
-import type { ViolationAlert } from "../dto/ViolationAlert.js";
-import type { UseCaseError } from "../errors/AppErrors.js";
-import { ViolationAlertMapper } from "../mappers/ViolationAlertMapper.js";
+import type { ViolationAlert } from "@interface/response/ViolationAlert.js";
+import type { UseCaseError } from "@interface/errors/UseCaseError.js";
+import { ViolationAlertMapper } from "@interface/mappers/ViolationAlertMapper.js";
 import { DayAssemblyService } from "./DayAssemblyService.js";
 import { SocialJetLagEvaluationService } from "./SocialJetLagEvaluationService.js";
 

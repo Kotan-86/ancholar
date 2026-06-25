@@ -2,9 +2,9 @@
 import { SocialJetLagDiagnostic } from "@domain/services/SocialJetLagDiagnostic.js";
 import { TimelineCalculator } from "@domain/services/TimelineCalculator.js";
 import { err, ok, type Result } from "@shared/Result.js";
-import type { SocialJetLagAlertDTO } from "../dto/SocialJetLagAlertDTO.js";
-import type { UseCaseError } from "../errors/AppErrors.js";
-import type { TimelineRepository } from "../ports/TimelineRepository.js";
+import type { SocialJetLagAlertDTO } from "@interface/response/SocialJetLagAlertDTO.js";
+import type { UseCaseError } from "@interface/errors/UseCaseError.js";
+import type { TimelineRepository } from "@interface/ports/TimelineRepository.js";
 
 function nextCalendarDay(date: Date): Date {
   const next = new Date(date);

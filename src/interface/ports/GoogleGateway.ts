@@ -2,8 +2,8 @@
 import type { Result } from "@shared/Result.js";
 import type { AccountKind } from "@domain/value-objects/AccountKind.js";
 import type { BlockId } from "@domain/value-objects/BlockId.js";
-import type { CreatedEventRecord, CreatedTaskRecord } from "../dto/ExternalRecords.js";
-import type { UseCaseError } from "../errors/AppErrors.js";
+import type { CreatedEventRecord, CreatedTaskRecord } from "../records/ExternalRecords.js";
+import type { UseCaseError } from "../errors/UseCaseError.js";
 
 export interface GoogleGateway {
   updateTaskTime(

@@ -8,9 +8,9 @@ import {
 import type {
   ExternalEventRecord,
   ExternalTaskRecord,
-} from "@application/dto/ExternalRecords.js";
-import type { TimelineRepository } from "@application/ports/TimelineRepository.js";
-import type { UseCaseError } from "@application/errors/AppErrors.js";
+} from "@interface/records/ExternalRecords.js";
+import type { TimelineRepository } from "@interface/ports/TimelineRepository.js";
+import type { UseCaseError } from "@interface/errors/UseCaseError.js";
 import { err, ok, type Result } from "@shared/Result.js";
 
 const DEFAULT_TARGET_DATE = new Date("2026-06-21T21:00:00");

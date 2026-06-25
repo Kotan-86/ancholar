@@ -13,7 +13,7 @@
    * ビジネスルールの評価結果として、「真偽値（boolean）」や「状態を表すユニオン型（例: `'VALID' | 'EXCEEDS_CEILING'`）」などの純粋な値を返します。
 2. **アプリケーション層の文脈（エラーの検出と構成）**
    * ユースケースは、ドメイン層から返された評価結果を受け取ります。
-   * 「どのユースケースで」「どのような操作をして」そのルールに抵触したのかという文脈を付与し、アプリケーション全体で扱う `Result` 型のエラー（Err）として構築・返却します。
+   * 「どのユースケースで」「どのような操作をして」そのルールに抵触したのかという文脈を付与し、`interface/errors/UseCaseError` として構築・返却します。
 
 ---
 
@@ -36,12 +36,12 @@ export const err = <E>(error: E): Err<E> => ({ isOk: false, error });
 
 ---
 
-### 3. アプリケーションエラーの型定義
+### 3. ユースケースエラーの型定義
 
-システムで発生しうるすべてのエラーは、アプリケーション層で定義します。これにより、ドメイン層は特定のエラーフォーマットに依存しなくなります。
+システムで発生しうるすべてのエラーは、インターフェイス層で定義します。Port の戻り値型としても利用され、外側の層（`frameworks-drivers`）が内側へ依存する際の契約となります。ドメイン層は特定のエラーフォーマットに依存しません。
 
 ```typescript
-// src/application/errors/AppErrors.ts
+// src/interface/errors/UseCaseError.ts
 
 // ドメインルールの違反に起因するエラー
 export type RuleViolationError = {
@@ -107,7 +107,7 @@ export class TaskPlacementValidator {
 // src/application/usecases/ChangeTimeBoxDurationUseCase.ts
 
 import { Result, ok, err } from "../../shared/Result";
-import { UseCaseError } from "../errors/AppErrors";
+import { UseCaseError } from "@interface/errors/UseCaseError";
 
 export class ChangeTimeBoxDurationUseCase {
   constructor(
@@ -188,6 +188,6 @@ const handleDragEnd = async (taskId, newStart, newEnd) => {
 };
 ```
 
-## 5. インフレ層における「例外の封じ込め」
+## 5. フレームワーク&ドライバー層における「例外の封じ込め」
 
-サードパーティ製ライブラリ（googleapis など）が投げる例外は、インフラ層の最境界（GatewayやRepositoryの実装内）で必ずキャッチし、直ちに Result 型（Err<ExternalApiError>）に変換します。これにより、アプリケーションのコア部分へ例外が侵入することを防ぎます。
+サードパーティ製ライブラリ（googleapis など）が投げる例外は、`frameworks-drivers` 層の最境界（Gateway や Repository の実装内）で必ずキャッチし、直ちに `Result` 型（`Err<UseCaseError>`）に変換します。これにより、アプリケーションのコア部分へ例外が侵入することを防ぎます。

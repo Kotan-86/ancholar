@@ -2,7 +2,7 @@
 import {
   FakeTimelineRepository,
   type FakeTimelineRepositoryOptions,
-} from "@infrastructure/fake/FakeTimelineRepository.js";
+} from "@frameworks-drivers/fake/FakeTimelineRepository.js";
 
 export type { FakeTimelineRepositoryOptions };
 

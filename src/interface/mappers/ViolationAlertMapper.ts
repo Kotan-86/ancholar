@@ -1,6 +1,6 @@
 // 仕様: docs/application/usecase.md#UC-3
 import type { ViolationFinding, ViolationKind } from "@domain/services/ViolationCollector.js";
-import type { ViolationAlert } from "../dto/ViolationAlert.js";
+import type { ViolationAlert } from "../response/ViolationAlert.js";
 
 export class ViolationAlertMapper {
   static fromFindings(findings: ViolationFinding[]): ViolationAlert[] {

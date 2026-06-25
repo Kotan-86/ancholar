@@ -4,7 +4,7 @@ import { ValidateExternalChangesUseCase } from "@application/usecases/ValidateEx
 import { DayAssemblyService } from "@application/services/DayAssemblyService.js";
 import { AccountKind } from "@domain/value-objects/AccountKind.js";
 import { BlockId } from "@domain/value-objects/BlockId.js";
-import { FakeExternalChangeRepository } from "@infrastructure/fake/FakeExternalChangeRepository.js";
+import { FakeExternalChangeRepository } from "@frameworks-drivers/fake/FakeExternalChangeRepository.js";
 import { createFakeTimelineRepository } from "../../helpers/createFakeTimelineRepository.js";
 import { buildValidDay } from "../../helpers/buildValidDay.js";
 

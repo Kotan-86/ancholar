@@ -2,8 +2,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { BlockId } from "@domain/value-objects/BlockId.js";
 import { ChangeTimeBoxDurationUseCase } from "@application/usecases/ChangeTimeBoxDurationUseCase.js";
-import type { GoogleGateway } from "@application/ports/GoogleGateway.js";
-import type { TimelineRepository } from "@application/ports/TimelineRepository.js";
+import type { GoogleGateway } from "@interface/ports/GoogleGateway.js";
+import type { TimelineRepository } from "@interface/ports/TimelineRepository.js";
 import { err, ok } from "@shared/Result.js";
 import { buildValidDay } from "../../helpers/buildValidDay.js";
 import { buildWorkTask } from "../../helpers/buildWorkTask.js";

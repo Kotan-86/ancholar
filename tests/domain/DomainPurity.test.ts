@@ -36,8 +36,8 @@ describe("DomainPurity", () => {
     expect(violations).toEqual([]);
   });
 
-  it("src/domain/ が Result や application/errors を import していない", () => {
-    const forbiddenImport = /from\s+['"](?:@shared|\.\.\/shared|@application|\.\.\/application)/;
+  it("src/domain/ が Result や外側の層を import していない", () => {
+    const forbiddenImport = /from\s+['"](?:@shared|\.\.\/shared|@application|\.\.\/application|@interface|\.\.\/interface|@frameworks-drivers|\.\.\/frameworks-drivers)/;
     const violations = domainFiles
       .map((file) => ({ file, content: readFileSync(file, "utf8") }))
       .filter(({ content }) => forbiddenImport.test(content))
