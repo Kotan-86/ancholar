@@ -12,6 +12,7 @@ export default defineConfig({
       "@application": path.resolve(__dirname, "src/application"),
       "@interface": path.resolve(__dirname, "src/interface"),
       "@frameworks-drivers": path.resolve(__dirname, "src/frameworks-drivers"),
+      "@presentation": path.resolve(__dirname, "src/frameworks-drivers/presentation"),
     },
   },
 });

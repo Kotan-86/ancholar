@@ -115,19 +115,21 @@ src/
 │   └── errors/
 │       └── UseCaseError.ts
 │
-├── frameworks-drivers/   # 【フレームワーク&ドライバー層】Port の具象実装・外部 API 通信
+├── frameworks-drivers/     # 【フレームワーク&ドライバー層】Port の具象実装・外部 API 通信・UI 配線
 │   ├── google/             # （未実装）Google API クライアント
 │   │   ├── googleCalendarClient.ts
 │   │   └── googleTasksClient.ts
 │   ├── mappers/            # （未実装）Google API DTO ⇄ records の防腐層
-│   └── fake/               # テスト・開発用 Fake 実装
-│       ├── FakeExternalChangeRepository.ts
-│       ├── FakeGoogleGateway.ts
-│       └── FakeTimelineRepository.ts
-│
-├── presentation/           # 【UI 層】（未実装）Refine / React
-│   ├── components/
-│   └── hooks/
+│   ├── fake/               # テスト・開発用 Fake 実装
+│   │   ├── FakeExternalChangeRepository.ts
+│   │   ├── FakeGoogleGateway.ts
+│   │   └── FakeTimelineRepository.ts
+│   ├── presentation/       # 【プレゼンテーション層】UC-1 画面コンポーネント（TimelineDTO のみを入力とする）
+│   │   ├── components/
+│   │   └── utils/
+│   └── nextjs/             # Next.js アプリ（Composition Root・ルーティング）
+│       ├── composition/    # UseCase 配線（Fake → Application）
+│       └── app/            # App Router（Server Component）
 │
 └── shared/                 # 【共有カーネル】層横断の汎用型
     └── Result.ts
@@ -136,25 +138,54 @@ tests/
 ├── domain/
 ├── application/
 ├── frameworks-drivers/
+├── layer/                  # 層依存ルールの静的検証
 ├── integration/
 └── helpers/
 ```
+
+### 開発サーバー（UC-1 縦切り）
+
+Phase 1 の日次タイムライン画面をローカルで確認する:
+
+```bash
+npm run dev:web
+```
+
+Next.js プロジェクトルートは `src/frameworks-drivers/nextjs/`。仕様は [`docs/spec/presentation-uc1.md`](docs/spec/presentation-uc1.md) を参照。
 
 ### 依存方向
 
 外側の層から内側の層へだけ依存する。例外は認めない。
 
 ```
-presentation → interface → application → domain
-frameworks-drivers → interface → domain
+nextjs/app → presentation / nextjs/composition / interface
+nextjs/composition → application / frameworks-drivers/fake / interface / domain / shared
+presentation → interface / domain / shared
+frameworks-drivers（fake, google 等）→ interface / domain / shared
+application → domain / interface / shared
+interface → domain / shared
 shared ← （domain / application / interface / frameworks-drivers / presentation）
 ```
 
 - `domain` は他の層に依存しない
 - `application` は `domain`・`interface`・`shared` のみに依存する
 - `interface` は `domain`・`shared` のみに依存する
-- `frameworks-drivers` は `interface`・`domain`・`shared` に依存する（Port を実装）
+- `frameworks-drivers/fake` および `google` 等は `interface`・`domain`・`shared` に依存する（Port を実装）
+- **`presentation`**（`frameworks-drivers/presentation`）は `@interface`・`@domain`・`@shared` のみ import 可能。`@application` および Next.js 配線（`composition` 等）への依存は禁止（[`docs/spec/presentation-uc1.md` §2-6](docs/spec/presentation-uc1.md#2-6-層依存の制約)）
+- **`nextjs/composition`** は UseCase の組み立てのみを担い、`@application`・`@frameworks-drivers/fake`・`@interface`・`@domain`・`@shared` を import 可能
+- **`nextjs/app`** は `@presentation`・`@frameworks-drivers/nextjs/composition`・`@interface` のみ import 可能（日付取得は Server Component のみ）
 - 例外は `frameworks-drivers` 最外縁で `Result` に変換し、内側へ伝播しない（`docs/error.md` 参照）
+
+### Path alias（TypeScript / Vitest）
+
+| エイリアス | 実パス |
+| :--- | :--- |
+| `@domain/*` | `src/domain/*` |
+| `@application/*` | `src/application/*` |
+| `@interface/*` | `src/interface/*` |
+| `@frameworks-drivers/*` | `src/frameworks-drivers/*` |
+| `@presentation/*` | `src/frameworks-drivers/presentation/*` |
+| `@shared/*` | `src/shared/*` |
 
 
 ## プラットフォーム ＆ 外部連携要件
