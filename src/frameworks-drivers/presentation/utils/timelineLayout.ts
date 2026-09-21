@@ -1,4 +1,4 @@
-// 仕様: docs/spec/presentation-uc1.md#2-4-WORK-TIME-タイムグリッドとタスク面
+// 仕様: docs/spec/presentation-uc1.md#2-4-work-time-区間のタスク面 (AC-8 / AC-21 / AC-22)
 import type { TaskDTO } from "@interface/response/TimelineDTO.js";
 
 const MILLISECONDS_PER_MINUTE = 60 * 1000;

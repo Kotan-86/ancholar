@@ -1,4 +1,4 @@
-// 仕様: docs/spec/presentation-uc1.md#2-2-日付の指定 / Task 5
+// 仕様: docs/spec/presentation-uc1.md#2-2-ヘッダーと日付ナビゲーション / Task 5
 // 仕様: docs/spec/day-duration.md#受入基準 (A-11: 既定の起点 20:30 Asia/Tokyo = UTC 11:30)
 import { afterEach, describe, expect, it } from "vitest";
 import {

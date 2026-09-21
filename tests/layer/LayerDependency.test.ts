@@ -1,4 +1,4 @@
-// 仕様: README.md#依存方向 / docs/spec/presentation-uc1.md#2-6-層依存の制約
+// 仕様: README.md#依存方向 / docs/spec/presentation-uc1.md#2-7-層依存の制約
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";

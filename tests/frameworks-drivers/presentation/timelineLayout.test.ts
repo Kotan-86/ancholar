@@ -1,4 +1,4 @@
-// 仕様: docs/spec/presentation-uc1.md#AC-8
+// 仕様: docs/spec/presentation-uc1.md#2-4-work-time-区間のタスク面 (AC-8 / AC-21 / AC-22)
 import { describe, expect, it } from "vitest";
 import { calculateTimelineTaskLayout } from "@presentation/utils/timelineLayout.js";
 
@@ -9,7 +9,7 @@ describe("calculateTimelineTaskLayout", () => {
   it("anchorDate と1日の総時間から top と height の割合を算出する", () => {
     const result = calculateTimelineTaskLayout({
       anchorDate,
-      totalDurationMinutes: 23 * 60,
+      totalDurationMinutes: 1440,
       task: {
         startTime: new Date("2026-06-22T09:00:00"),
         endTime: new Date("2026-06-22T10:30:00"),
@@ -18,14 +18,14 @@ describe("calculateTimelineTaskLayout", () => {
     });
 
     expect(result).not.toBeNull();
-    expect(result?.topPercent).toBeCloseTo((12 * 60 * 100) / (23 * 60));
-    expect(result?.heightPercent).toBeCloseTo((90 * 100) / (23 * 60));
+    expect(result?.topPercent).toBeCloseTo((12 * 60 * 100) / (1440));
+    expect(result?.heightPercent).toBeCloseTo((90 * 100) / (1440));
   });
 
   it("endTime が null の場合は fallbackEndTime を終端に使う", () => {
     const result = calculateTimelineTaskLayout({
       anchorDate,
-      totalDurationMinutes: 23 * 60,
+      totalDurationMinutes: 1440,
       task: {
         startTime: new Date("2026-06-22T16:00:00"),
         endTime: null,
@@ -33,16 +33,16 @@ describe("calculateTimelineTaskLayout", () => {
       fallbackEndTime,
     });
 
-    expect(result?.heightPercent).toBeCloseTo((60 * 100) / (23 * 60));
+    expect(result?.heightPercent).toBeCloseTo((60 * 100) / (1440));
   });
 
   it("1日全体を占める期間は top 0%、height 100% を返す", () => {
-    const dayEnd = new Date(anchorDate.getTime() + 23 * 60 * 60 * 1000);
+    const dayEnd = new Date(anchorDate.getTime() + 1440 * 60 * 1000);
 
     expect(
       calculateTimelineTaskLayout({
         anchorDate,
-        totalDurationMinutes: 23 * 60,
+        totalDurationMinutes: 1440,
         task: { startTime: anchorDate, endTime: dayEnd },
         fallbackEndTime,
       }),
@@ -70,7 +70,7 @@ describe("calculateTimelineTaskLayout", () => {
     expect(
       calculateTimelineTaskLayout({
         anchorDate: new Date(Number.NaN),
-        totalDurationMinutes: 23 * 60,
+        totalDurationMinutes: 1440,
         task: {
           startTime: new Date("2026-06-22T09:00:00"),
           endTime: new Date("2026-06-22T10:00:00"),
@@ -82,7 +82,7 @@ describe("calculateTimelineTaskLayout", () => {
     expect(
       calculateTimelineTaskLayout({
         anchorDate,
-        totalDurationMinutes: 23 * 60,
+        totalDurationMinutes: 1440,
         task: {
           startTime: new Date("2026-06-22T10:00:00"),
           endTime: new Date("2026-06-22T10:00:00"),

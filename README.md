@@ -126,8 +126,9 @@ src/
 │   │   ├── FakeExternalChangeRepository.ts
 │   │   ├── FakeGoogleGateway.ts
 │   │   └── FakeTimelineRepository.ts
-│   ├── presentation/       # 【プレゼンテーション層】UC-1 画面コンポーネント（TimelineDTO のみを入力とする）
+│   ├── presentation/       # 【プレゼンテーション層】UC-1 画面コンポーネント（TimelineDTO と UseCaseError を入力とする）
 │   │   ├── components/
+│   │   ├── styles/         # 配色定数
 │   │   └── utils/
 │   └── nextjs/             # Next.js アプリ（Composition Root・ルーティング）
 │       ├── composition/    # UseCase 配線（Fake → Application）
