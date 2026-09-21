@@ -5,10 +5,27 @@ import { TimelineEnrichmentService } from "@application/services/TimelineEnrichm
 import { GetDailyTimelineUseCase } from "@application/usecases/GetDailyTimelineUseCase.js";
 import { AccountKind } from "@domain/value-objects/AccountKind.js";
 import { BlockId, listNameFromBlockId } from "@domain/value-objects/BlockId.js";
+import {
+  DEFAULT_LIFESTYLE_SETTINGS,
+  type LifestyleSettings,
+} from "@domain/value-objects/LifestyleSettings.js";
 import type { ExternalTaskRecord } from "@interface/records/ExternalRecords.js";
 import { FakeTimelineRepository } from "@frameworks-drivers/fake/FakeTimelineRepository.js";
 
 const MINUTE_MS = 60 * 1000;
+
+// 仕様: docs/spec/presentation-uc1.md#2-8-表示確認用シナリオq-10--q-19-決定
+// 表示確認用シナリオの日付キー(YYYY-MM-DD)。
+const SMALL_CARD_DATE_KEY = "2026-06-28";
+const MANY_WARNINGS_DATE_KEY = "2026-06-30";
+// 06-28: FOCUS TIME が 10 分(= 8px)になる始業 07:10。
+const SMALL_CARD_SETTINGS: LifestyleSettings = {
+  ...DEFAULT_LIFESTYLE_SETTINGS,
+  workStartHour: 7,
+  workStartMinute: 10,
+};
+// 06-30: 警告領域の内部スクロールが起きる件数(既定1件 + 追加19件 = 20件。増やしてよい)。
+const EXTRA_INVALID_MAPPING_COUNT = 19;
 
 /**
  * UC-1 Phase 1 用の Composition Root。
@@ -17,10 +34,13 @@ const MINUTE_MS = 60 * 1000;
 export function createDailyTimelineUseCase(
   targetDate: Date,
 ): GetDailyTimelineUseCase {
+  // setScenarioForDate は使わず、その日のリクエストで作る Fake のコンストラクタに渡す(O-22 の衝突の回避)。
+  const dateKey = formatDateKey(targetDate);
   const timelineRepository = new FakeTimelineRepository({
     targetDate,
     downTimeStart: targetDate,
     tasks: createTasksForDate(targetDate),
+    ...(dateKey === SMALL_CARD_DATE_KEY ? { settings: SMALL_CARD_SETTINGS } : {}),
   });
 
   // 仕様: docs/spec/day-duration.md §10（QD-13 の回避）
@@ -43,6 +63,11 @@ export function createDailyTimelineUseCase(
 
 function createTasksForDate(targetDate: Date): ExternalTaskRecord[] {
   const dateLabel = formatDateKey(targetDate);
+
+  const manyWarningTasks: ExternalTaskRecord[] =
+    dateLabel === MANY_WARNINGS_DATE_KEY
+      ? createExtraInvalidMappingTasks(targetDate, dateLabel)
+      : [];
 
   return [
     {
@@ -75,7 +100,27 @@ function createTasksForDate(targetDate: Date): ExternalTaskRecord[] {
       endTime: addMinutes(targetDate, 15 * 60),
       listName: listNameFromBlockId(BlockId.FREE_TIME),
     },
+    ...manyWarningTasks,
   ];
+}
+
+function createExtraInvalidMappingTasks(
+  targetDate: Date,
+  dateLabel: string,
+): ExternalTaskRecord[] {
+  return Array.from({ length: EXTRA_INVALID_MAPPING_COUNT }, (_, i) => {
+    const n = i + 1;
+    return {
+      id: `invalid-mapping-${dateLabel}-${n}`,
+      title: `不正マッピング ${dateLabel} #${n}`,
+      description: "警告領域の内部スクロール確認用の追加タスク",
+      blockId: BlockId.WORK_TIME,
+      accountKind: AccountKind.Work,
+      startTime: addMinutes(targetDate, 14 * 60),
+      endTime: addMinutes(targetDate, 15 * 60),
+      listName: listNameFromBlockId(BlockId.FREE_TIME),
+    };
+  });
 }
 
 function addMinutes(date: Date, minutes: number): Date {

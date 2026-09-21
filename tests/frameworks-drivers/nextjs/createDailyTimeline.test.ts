@@ -1,4 +1,4 @@
-// 仕様: docs/spec/presentation-uc1.md / Task 2 Composition Root
+// 仕様: docs/spec/presentation-uc1.md#2-8-表示確認用シナリオq-10--q-19-決定 (AC-19 ②③④) / Task 2 Composition Root
 // 仕様: docs/spec/day-duration.md#受入基準 (A-9: 既定シナリオの 1440 分・夕食の枠内・翌日の成立)
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { TimelineCalculator } from "@domain/services/TimelineCalculator.js";
@@ -150,5 +150,76 @@ describe("createDailyTimelineUseCase", () => {
         expect.objectContaining({ id: "work-2026-06-22" }),
       ]),
     );
+  });
+
+  // ---- 表示確認用シナリオ(仕様: docs/spec/presentation-uc1.md#2-8-表示確認用シナリオq-10--q-19-決定 / AC-19) ----
+  const MIN = 60 * 1000;
+  // 既定の標準の1日(起点 +分 の区切り): DOWN 0 / SLEEP 90 / WALK 540 / FOCUS 630 / WORK 720 / GRADATION 1290 / FREE 1350 / 終端 1440
+  const DEFAULT_OFFSETS = [0, 90, 540, 630, 720, 1290, 1350, 1440];
+
+  async function fetchDay(dateText: string) {
+    const targetDate = new Date(`${dateText}T20:30:00+09:00`);
+    const result = await createDailyTimelineUseCase(targetDate).execute({ targetDate });
+    expect(result.isOk).toBe(true);
+    if (!result.isOk) throw new Error("UC-1 failed");
+    return { targetDate, dto: result.value };
+  }
+
+  const plotted = (dto: { blocks: { tasks: { shouldPlotOnGrid: boolean }[] }[] }) =>
+    dto.blocks.flatMap((b) => b.tasks).filter((t) => t.shouldPlotOnGrid);
+
+  it("AC-19② 2026-06-28: FOCUS 10分・WORK 07:10–16:40・FREE 170分・総時間1440・違反1件・時差ぼけ true・面1件", async () => {
+    const { dto } = await fetchDay("2026-06-28");
+    const byId = (id: string) => dto.blocks.find((b) => b.blockId === id)!;
+
+    expect(dto.totalDurationMinutes).toBe(1440);
+    expect(byId(BlockId.FOCUS_TIME).durationMinutes).toBe(10);
+    expect(byId(BlockId.WORK_TIME).startTime).toEqual(new Date("2026-06-29T07:10:00+09:00"));
+    expect(byId(BlockId.WORK_TIME).endTime).toEqual(new Date("2026-06-29T16:40:00+09:00"));
+    expect(byId(BlockId.FREE_TIME).durationMinutes).toBe(170);
+    expect(dto.violations).toHaveLength(1);
+    expect(dto.violations?.[0]?.violationType).toBe("INVALID_MAPPING");
+    expect(dto.socialJetLagWarning).toBe(true);
+    expect(plotted(dto)).toHaveLength(1);
+  });
+
+  it("AC-19③ 2026-06-30: 違反が20件以上で全件 INVALID_MAPPING・targetTitle は全件相異・ブロックと総時間は既定と同一・面1件", async () => {
+    const { targetDate, dto } = await fetchDay("2026-06-30");
+
+    expect(dto.violations!.length).toBeGreaterThanOrEqual(20);
+    for (const v of dto.violations!) expect(v.violationType).toBe("INVALID_MAPPING");
+    const titles = dto.violations!.map((v) => v.targetTitle);
+    expect(new Set(titles).size).toBe(titles.length);
+    expect(dto.socialJetLagWarning).toBe(true);
+
+    expect(dto.totalDurationMinutes).toBe(1440);
+    expect(dto.blocks).toHaveLength(7);
+    dto.blocks.forEach((b, i) => {
+      expect(b.startTime.getTime()).toBe(targetDate.getTime() + DEFAULT_OFFSETS[i]! * MIN);
+      expect(b.endTime.getTime()).toBe(targetDate.getTime() + DEFAULT_OFFSETS[i + 1]! * MIN);
+    });
+    expect(plotted(dto)).toHaveLength(1);
+  });
+
+  it.each(["2026-06-27", "2026-06-29", "2026-07-01"])(
+    "AC-19④ %s: 確認用シナリオの追加で変わらない(始業08:30・違反1件・時差ぼけ true)",
+    async (dateText) => {
+      const { targetDate, dto } = await fetchDay(dateText);
+      const work = dto.blocks.find((b) => b.blockId === BlockId.WORK_TIME)!;
+
+      expect(work.startTime.getTime()).toBe(targetDate.getTime() + 720 * MIN);
+      expect(dto.violations).toHaveLength(1);
+      expect(dto.socialJetLagWarning).toBe(true);
+      expect(dto.totalDurationMinutes).toBe(1440);
+    },
+  );
+
+  it("既定シナリオ 2026-06-21 は変わらない(違反1件・面1件・始業08:30)", async () => {
+    const { targetDate, dto } = await fetchDay("2026-06-21");
+    const work = dto.blocks.find((b) => b.blockId === BlockId.WORK_TIME)!;
+
+    expect(work.startTime.getTime()).toBe(targetDate.getTime() + 720 * MIN);
+    expect(dto.violations).toHaveLength(1);
+    expect(plotted(dto)).toHaveLength(1);
   });
 });
