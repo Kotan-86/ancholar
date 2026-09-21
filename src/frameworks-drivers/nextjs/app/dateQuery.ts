@@ -1,6 +1,8 @@
 const DEFAULT_DATE_PARAM = "2026-06-21";
 const DATE_PARAM_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
-const TOKYO_TARGET_HOUR_UTC = 12;
+// 仕様: docs/spec/day-duration.md §4-3 / A-11（既定の起点は Asia/Tokyo 20:30 = UTC 11:30）
+const TOKYO_TARGET_HOUR_UTC = 11;
+const TOKYO_TARGET_MINUTE_UTC = 30;
 
 const tokyoDateFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "Asia/Tokyo",
@@ -9,7 +11,7 @@ const tokyoDateFormatter = new Intl.DateTimeFormat("en-US", {
   day: "2-digit",
 });
 
-/** URL の暦日を、UC-1 が期待する当日 21:00 の Date に変換する。 */
+/** URL の暦日を、UC-1 が期待する当日 20:30（Asia/Tokyo）の Date に変換する。 */
 export function parseTargetDate(value: string | string[] | undefined): Date {
   const dateParam = typeof value === "string" ? value : DEFAULT_DATE_PARAM;
   const match = DATE_PARAM_PATTERN.exec(dateParam);
@@ -52,7 +54,7 @@ function createDefaultTargetDate(): Date {
   return createTokyoTargetDate(2026, 5, 21);
 }
 
-/** Asia/Tokyo の21:00（UTC 12:00）をホストTZに依存せず生成する。 */
+/** Asia/Tokyo の20:30（UTC 11:30）をホストTZに依存せず生成する。 */
 function createTokyoTargetDate(
   year: number,
   monthIndex: number,
@@ -60,7 +62,7 @@ function createTokyoTargetDate(
 ): Date {
   const targetDate = new Date(0);
   targetDate.setUTCFullYear(year, monthIndex, day);
-  targetDate.setUTCHours(TOKYO_TARGET_HOUR_UTC, 0, 0, 0);
+  targetDate.setUTCHours(TOKYO_TARGET_HOUR_UTC, TOKYO_TARGET_MINUTE_UTC, 0, 0);
   return targetDate;
 }
 

@@ -57,6 +57,8 @@ describe("ChangeTimeBoxDuration integration", () => {
   it("手順4-6 正常系（ブロック変更）: evaluateBlockResize VALID → applyResize → ok(DTO)", async () => {
     const day = buildValidDay();
     const work = day.getBlock(BlockId.WORK_TIME);
+    // 仕様: docs/spec/day-duration.md#受入基準 F-1(WORK の標準長に依存せず「1時間縮める」意図を相対値で検査)
+    const baseWorkMinutes = work.duration().minutes;
     const newEnd = new Date(work.timeRange.end.getTime() - 60 * 60 * 1000);
 
     const { timelineRepo, googleGateway } = createMocks();
@@ -75,7 +77,7 @@ describe("ChangeTimeBoxDuration integration", () => {
     expect(result.isOk).toBe(true);
     if (result.isOk) {
       const workDto = result.value.blocks.find((b) => b.blockId === BlockId.WORK_TIME);
-      expect(workDto?.durationMinutes).toBe(7 * 60);
+      expect(workDto?.durationMinutes).toBe(baseWorkMinutes - 60);
     }
     expect(googleGateway.updateBlockTime).toHaveBeenCalledOnce();
   });

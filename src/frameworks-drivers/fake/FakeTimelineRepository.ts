@@ -13,7 +13,8 @@ import type { TimelineRepository } from "@interface/ports/TimelineRepository.js"
 import type { UseCaseError } from "@interface/errors/UseCaseError.js";
 import { err, ok, type Result } from "@shared/Result.js";
 
-const DEFAULT_TARGET_DATE = new Date("2026-06-21T21:00:00");
+// 仕様: docs/spec/day-duration.md §4-2 / A-11（既定の起点 20:30）
+const DEFAULT_TARGET_DATE = new Date("2026-06-21T20:30:00");
 
 export type FakeTimelineRepositoryOptions = {
   targetDate?: Date;

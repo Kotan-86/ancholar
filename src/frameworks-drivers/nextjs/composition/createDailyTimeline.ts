@@ -23,10 +23,12 @@ export function createDailyTimelineUseCase(
     tasks: createTasksForDate(targetDate),
   });
 
-  // 翌日の DOWN TIME を2時間遅らせ、社会的時差ぼけ警告を再現する。
+  // 仕様: docs/spec/day-duration.md §10（QD-13 の回避）
+  // 翌日の DOWN TIME を1時間15分遅らせ、社会的時差ぼけ警告を再現する。
+  // 2時間遅らせると WALK 終了が始業を追い越して日が破綻するため、成立する範囲に留める。
   const nextDate = addMinutes(targetDate, 24 * 60);
   timelineRepository.setScenarioForDate(nextDate, {
-    downTimeStart: addMinutes(nextDate, 2 * 60),
+    downTimeStart: addMinutes(nextDate, 75),
   });
 
   const dayAssembly = new DayAssemblyService(timelineRepository);
@@ -59,7 +61,8 @@ function createTasksForDate(targetDate: Date): ExternalTaskRecord[] {
       description: "グリッドに面表示しないプライベートタスク",
       blockId: BlockId.FREE_TIME,
       accountKind: AccountKind.Private,
-      startTime: addMinutes(targetDate, 22 * 60),
+      // 起点 + 23時間 = 19:30（FREE TIME 19:00–翌 20:30 の枠内。仕様 A-9）
+      startTime: addMinutes(targetDate, 23 * 60),
       listName: listNameFromBlockId(BlockId.FREE_TIME),
     },
     {
