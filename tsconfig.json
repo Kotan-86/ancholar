@@ -6,13 +6,13 @@
     "strict": true,
     "rootDir": ".",
     "outDir": "./dist",
-    "baseUrl": ".",
     "paths": {
       "@domain/*": ["./src/domain/*"],
       "@shared/*": ["./src/shared/*"],
       "@application/*": ["./src/application/*"],
       "@interface/*": ["./src/interface/*"],
-      "@frameworks-drivers/*": ["./src/frameworks-drivers/*"]
+      "@frameworks-drivers/*": ["./src/frameworks-drivers/*"],
+      "@presentation/*": ["./src/frameworks-drivers/presentation/*"]
     },
     "types": ["node"],
     "skipLibCheck": true,

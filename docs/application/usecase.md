@@ -105,7 +105,7 @@
 // UC-1, UC-2 用：画面描画のための統合タイムラインデータ
 export type TimelineDTO = {
   anchorDate: Date;               // 1日の起点（DOWN TIME開始時刻）
-  totalDurationMinutes: number;   // 1日の総時間（23h〜25h）
+  totalDurationMinutes: number;   // 1日の総時間（標準の設定では24時間。日によって23〜25時間）
   blocks: BlockDTO[];             // 7つのタイムブロックの配列
   socialJetLagWarning: boolean;   // 社会的時差ぼけ警告フラグ（翌日評価の結果と連動）
 };

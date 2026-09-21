@@ -4,8 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "test": "TZ=Asia/Tokyo vitest run",
+    "test:watch": "TZ=Asia/Tokyo vitest",
+    "dev:web": "npm run dev --prefix src/frameworks-drivers/nextjs",
+    "build:web": "npm run build --prefix src/frameworks-drivers/nextjs",
+    "typecheck:web": "npm run typecheck --prefix src/frameworks-drivers/nextjs"
   },
   "type": "module",
   "keywords": [],

@@ -17,12 +17,14 @@ Google APIの仕様変更やライフスタイルの変化（院生から社会�
 | ブロック名 (Block ID) | 標準時間 (Default) | 最小保証時間 (Floor) | 防衛レベル・システム特性 |
 | :--- | :--- | :--- | :--- |
 | **DOWN TIME** | 1.5時間 | **1.5時間 (固定)** | **【絶対死守・アンカー】** 1日の起点。短縮・時間枠の変更は一切不可 |
-| **SLEEP TIME** | 7.00時間 | **可変 (能動のみ)** | **【原則死守】** 夜更かし等の受動的短縮は禁止。娯楽等の能動的理由のみ短縮可 |
-| **WALK TIME** | 1.0時間 | **1.0時間 (固定)** | **【絶対死守】** 起床・身支度。短縮不可、時間枠固定 |
+| **SLEEP TIME** | 7.5時間 | **可変 (能動のみ)** | **【原則死守】** 夜更かし等の受動的短縮は禁止。娯楽等の能動的理由のみ短縮可 |
+| **WALK TIME** | 1.5時間 | **1.5時間 (固定)** | **【絶対死守】** 起床・身支度。短縮不可、時間枠固定 |
 | **FOCUS TIME** | 1.5時間 | **10分** | **【可変・クッション】** 朝の調整弁。どれだけ圧迫されても10分は必ず死守 |
-| **WORK TIME** | 可変 | **なし (0分も可)** | **【可変】** 仕事・研究。タスク削減によりどれだけでも縮小・前倒し終了可能 |
+| **WORK TIME** | 可変（標準 9.5時間） | **なし (0分も可)** | **【可変】** 仕事・研究。タスク削減によりどれだけでも縮小・前倒し終了可能 |
 | **GRADATION TIME** | 1.0時間 | **10分** | **【可変】** オンオフ切り替え。柔軟に変更可能だが最低10分は確保 |
-| **FREE TIME** | 2.0時間 | **30分** | **【可変・最大バッファ】** DOWN TIME直前。柔軟に変更可能だが最低30分は確保 |
+| **FREE TIME** | 1.5時間 | **30分** | **【可変・最大バッファ】** DOWN TIME直前。柔軟に変更可能だが最低30分は確保 |
+
+**標準の1日は、DOWN TIME 開始 20:30 を起点とする24時間である**（20:30 → 翌20:30）。内訳は DOWN 20:30〜22:00 / SLEEP 22:00〜05:30 / WALK 05:30〜07:00 / FOCUS 07:00〜08:30 / WORK 08:30〜18:00 / GRADATION 18:00〜19:00 / FREE 19:00〜20:30。**上の標準時間の単純合計と一致する。**
 
 ### ② タスク（Allocated Task）と可視化ルール
 Google ToDoリストから取得され、特定の「時間ブロック」に割り当てられるタスク。アカウントの属性（プライベート/仕事用）によってデータ構造が異なり、システム上の表示ルールが厳密に区別される。
@@ -41,7 +43,7 @@ Google ToDoリストから取得され、特定の「時間ブロック」に割
 ## 3. ビジネスルール ＆ 不変条件（Invariants）
 
 ### ルール①：DOWN TIME起点の動的タイムライン ＆ 土曜始まり（Time Anchor）
-* **1日の再定義:** 1日の始まり（カレンダーの最上部）は「0:00」ではなく、**「当日のDOWN TIME開始時刻」**とする。1日の区切り（`ChronologicalDay`）は、「当日のDOWN TIME開始」から「翌日のDOWN TIME開始」までとし、ライフスタイルや計算結果に応じて動的に伸縮する。
+* **1日の再定義:** 1日の始まり（カレンダーの最上部）は「0:00」ではなく、**「当日のDOWN TIME開始時刻」**とする。1日の区切り（`ChronologicalDay`）は、「当日のDOWN TIME開始」から「翌日のDOWN TIME開始」までとし、ライフスタイルや計算結果に応じて動的に伸縮する。標準の設定ではこれが24時間になる。
 * **週始まりの固定（土曜開始）:**
 アプリケーションにおける週次ビュー（Weekly View）およびデータ処理・集計の単位は、**必ず「土曜日」を起点（週の始まり）**として描画・計算する。
 * **時間軸のスライド:** 設定（始業時間など）が変更された場合、コードを修正することなく、カレンダー全体の時間軸の目盛りが自動でスライドする。
@@ -59,7 +61,7 @@ Google ToDoリストから取得され、特定の「時間ブロック」に割
 
 ### ルール④：防衛的タイムボックスとタスクの伸縮制御
 * **仕事用タスクのHard Ceiling（天井の固定）:** `WORK_TIME` 内のタスクを後ろに移動、あるいは長さを引き延ばす際、`WORK_TIME` 自体の終了時刻（＝GRADATION TIMEの開始境界線）を超えて後ろ倒しにすることをシステムレベルで禁止する。長さを維持したまま後ろ倒しになり、DOWN TIMEを押し潰す挙動はシステムレベルで禁止する。
-* **プライベートタスクの制約:** カレンダーのグリッド上には表示しないが、タスクが所属するBlock IDの有効時間枠内（例：FREE TIMEの枠が19:00〜21:00ならその間）に開始時刻が収まるよう、データ更新・登録時にはシステムがバリデーションを行う。
+* **プライベートタスクの制約:** カレンダーのグリッド上には表示しないが、タスクが所属するBlock IDの有効時間枠内（例：FREE TIMEの枠が19:00〜20:30ならその間）に開始時刻が収まるよう、データ更新・登録時にはシステムがバリデーションを行う。
 
 ### ルール⑤：社会的時差ぼけ（ソーシャルジェットラグ）警告システム
 * 各日ごとに、就寝時刻（`SLEEP TIME` 開始）と起床時刻（`SLEEP TIME` 終了）の中間時刻（睡眠中央時刻）をシステムが自動計算する。
@@ -115,19 +117,21 @@ src/
 │   └── errors/
 │       └── UseCaseError.ts
 │
-├── frameworks-drivers/   # 【フレームワーク&ドライバー層】Port の具象実装・外部 API 通信
+├── frameworks-drivers/     # 【フレームワーク&ドライバー層】Port の具象実装・外部 API 通信・UI 配線
 │   ├── google/             # （未実装）Google API クライアント
 │   │   ├── googleCalendarClient.ts
 │   │   └── googleTasksClient.ts
 │   ├── mappers/            # （未実装）Google API DTO ⇄ records の防腐層
-│   └── fake/               # テスト・開発用 Fake 実装
-│       ├── FakeExternalChangeRepository.ts
-│       ├── FakeGoogleGateway.ts
-│       └── FakeTimelineRepository.ts
-│
-├── presentation/           # 【UI 層】（未実装）Refine / React
-│   ├── components/
-│   └── hooks/
+│   ├── fake/               # テスト・開発用 Fake 実装
+│   │   ├── FakeExternalChangeRepository.ts
+│   │   ├── FakeGoogleGateway.ts
+│   │   └── FakeTimelineRepository.ts
+│   ├── presentation/       # 【プレゼンテーション層】UC-1 画面コンポーネント（TimelineDTO のみを入力とする）
+│   │   ├── components/
+│   │   └── utils/
+│   └── nextjs/             # Next.js アプリ（Composition Root・ルーティング）
+│       ├── composition/    # UseCase 配線（Fake → Application）
+│       └── app/            # App Router（Server Component）
 │
 └── shared/                 # 【共有カーネル】層横断の汎用型
     └── Result.ts
@@ -136,25 +140,54 @@ tests/
 ├── domain/
 ├── application/
 ├── frameworks-drivers/
+├── layer/                  # 層依存ルールの静的検証
 ├── integration/
 └── helpers/
 ```
+
+### 開発サーバー（UC-1 縦切り）
+
+Phase 1 の日次タイムライン画面をローカルで確認する:
+
+```bash
+npm run dev:web
+```
+
+Next.js プロジェクトルートは `src/frameworks-drivers/nextjs/`。仕様は [`docs/spec/presentation-uc1.md`](docs/spec/presentation-uc1.md) を参照。
 
 ### 依存方向
 
 外側の層から内側の層へだけ依存する。例外は認めない。
 
 ```
-presentation → interface → application → domain
-frameworks-drivers → interface → domain
+nextjs/app → presentation / nextjs/composition / interface
+nextjs/composition → application / frameworks-drivers/fake / interface / domain / shared
+presentation → interface / domain / shared
+frameworks-drivers（fake, google 等）→ interface / domain / shared
+application → domain / interface / shared
+interface → domain / shared
 shared ← （domain / application / interface / frameworks-drivers / presentation）
 ```
 
 - `domain` は他の層に依存しない
 - `application` は `domain`・`interface`・`shared` のみに依存する
 - `interface` は `domain`・`shared` のみに依存する
-- `frameworks-drivers` は `interface`・`domain`・`shared` に依存する（Port を実装）
+- `frameworks-drivers/fake` および `google` 等は `interface`・`domain`・`shared` に依存する（Port を実装）
+- **`presentation`**（`frameworks-drivers/presentation`）は `@interface`・`@domain`・`@shared` のみ import 可能。`@application` および Next.js 配線（`composition` 等）への依存は禁止（[`docs/spec/presentation-uc1.md` §2-6](docs/spec/presentation-uc1.md#2-6-層依存の制約)）
+- **`nextjs/composition`** は UseCase の組み立てのみを担い、`@application`・`@frameworks-drivers/fake`・`@interface`・`@domain`・`@shared` を import 可能
+- **`nextjs/app`** は `@presentation`・`@frameworks-drivers/nextjs/composition`・`@interface` のみ import 可能（日付取得は Server Component のみ）
 - 例外は `frameworks-drivers` 最外縁で `Result` に変換し、内側へ伝播しない（`docs/error.md` 参照）
+
+### Path alias（TypeScript / Vitest）
+
+| エイリアス | 実パス |
+| :--- | :--- |
+| `@domain/*` | `src/domain/*` |
+| `@application/*` | `src/application/*` |
+| `@interface/*` | `src/interface/*` |
+| `@frameworks-drivers/*` | `src/frameworks-drivers/*` |
+| `@presentation/*` | `src/frameworks-drivers/presentation/*` |
+| `@shared/*` | `src/shared/*` |
 
 
 ## プラットフォーム ＆ 外部連携要件

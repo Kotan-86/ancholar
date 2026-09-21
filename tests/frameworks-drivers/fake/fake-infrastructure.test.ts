@@ -41,6 +41,18 @@ describe("FakeTimelineRepository", () => {
     }
   });
 
+  // 仕様: docs/spec/day-duration.md#受入基準 (A-11)
+  it("既定の起点は 2026-06-21 20:30(Asia/Tokyo) (A-11)", async () => {
+    const repo = new FakeTimelineRepository();
+
+    const downTime = await repo.getDownTimeStart(targetDate);
+
+    expect(downTime.isOk).toBe(true);
+    if (downTime.isOk) {
+      expect(downTime.value.toISOString()).toBe("2026-06-21T11:30:00.000Z");
+    }
+  });
+
   it("シナリオ別タスクを日付ごとに返す", async () => {
     const workTask = buildWorkTask({ id: "task-1" });
     const repo = new FakeTimelineRepository({

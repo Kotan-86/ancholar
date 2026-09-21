@@ -1,4 +1,5 @@
 // 仕様: README.md ルール①② DOWN TIME起点 / FOCUS TIME クッション
+// 仕様: docs/spec/day-duration.md#4-2-標準の1日24時間の内訳--決定済みd-q-2（1日の目標値 24時間。D-Q-1 = A）
 import { ChronologicalDay } from "../entities/ChronologicalDay.js";
 import { ScheduledTimeBlock } from "../entities/ScheduledTimeBlock.js";
 import { BlockId } from "../value-objects/BlockId.js";
@@ -11,7 +12,9 @@ import { getTimeBlockSpec } from "../value-objects/TimeBlockSpec.js";
 import { TimeRange } from "../value-objects/TimeRange.js";
 
 const FOCUS_FLOOR_MINUTES = 10;
-const DAY_TARGET_MINUTES = 23 * 60;
+// 1日の目標値（入力）。FREE TIME がこの終端までの残余を受け持つ（D-Q-1 = A）。
+// 仕様: docs/spec/day-duration.md §2-2 D-Q-1 / §4-3
+const DAY_TARGET_MINUTES = 24 * 60;
 
 export class TimelineCalculator {
   static buildDay(

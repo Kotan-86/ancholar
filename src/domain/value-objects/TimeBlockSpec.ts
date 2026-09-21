@@ -1,4 +1,5 @@
 // 仕様: README.md §① 7つの時間ブロック（Time Blocks）
+// 仕様: docs/spec/day-duration.md#4-2-標準の1日24時間の内訳--決定済みd-q-2 / #10-制約関連機能（標準時間の値）
 import { BlockId } from "./BlockId.js";
 import { Duration } from "./Duration.js";
 
@@ -33,15 +34,15 @@ const SPECS: Record<BlockId, TimeBlockSpec> = {
   },
   [BlockId.SLEEP_TIME]: {
     blockId: BlockId.SLEEP_TIME,
-    defaultDuration: Duration.fromHours(7),
+    defaultDuration: Duration.fromHours(7.5),
     floor: { kind: "activeOnlyVariable" },
     defenseLevel: "principle",
     isDurationFixed: false,
   },
   [BlockId.WALK_TIME]: {
     blockId: BlockId.WALK_TIME,
-    defaultDuration: Duration.fromHours(1),
-    floor: { kind: "fixed", minutes: 60 },
+    defaultDuration: Duration.fromHours(1.5),
+    floor: { kind: "fixed", minutes: 90 },
     defenseLevel: "absolute",
     isDurationFixed: true,
   },
@@ -68,7 +69,7 @@ const SPECS: Record<BlockId, TimeBlockSpec> = {
   },
   [BlockId.FREE_TIME]: {
     blockId: BlockId.FREE_TIME,
-    defaultDuration: Duration.fromHours(2),
+    defaultDuration: Duration.fromHours(1.5),
     floor: { kind: "fixed", minutes: 30 },
     defenseLevel: "maxBuffer",
     isDurationFixed: false,

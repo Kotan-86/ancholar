@@ -30,14 +30,24 @@ describe("ChronologicalDay", () => {
     ]);
   });
 
-  it("総 duration が 23h〜25h", () => {
+  // 仕様: docs/spec/day-duration.md#受入基準 A-1, A-6
+  it("標準シナリオ（起点 20:30）の総時間は 1440 分ちょうど (A-1, A-6)", () => {
     const day = TimelineCalculator.buildDay(
-      new Date("2026-06-21T21:00:00"),
+      new Date("2026-06-21T20:30:00"),
       DEFAULT_LIFESTYLE_SETTINGS,
     );
-    const total = day.totalDuration().minutes;
-    expect(total).toBeGreaterThanOrEqual(23 * 60);
-    expect(total).toBeLessThanOrEqual(25 * 60);
+    expect(day.totalDuration().minutes).toBe(1440);
+  });
+
+  // 仕様: docs/spec/day-duration.md#受入基準 A-1
+  it("7ブロックの長さの合計が totalDuration と一致し 1440 になる (A-1)", () => {
+    const day = TimelineCalculator.buildDay(
+      new Date("2026-06-21T20:30:00"),
+      DEFAULT_LIFESTYLE_SETTINGS,
+    );
+    const sum = day.blocks.reduce((acc, b) => acc + b.duration().minutes, 0);
+    expect(sum).toBe(1440);
+    expect(sum).toBe(day.totalDuration().minutes);
   });
 
   it("隣接ブロックの end === next start", () => {

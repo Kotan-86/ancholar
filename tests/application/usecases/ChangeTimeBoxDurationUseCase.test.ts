@@ -220,8 +220,8 @@ describe("ChangeTimeBoxDurationUseCase", () => {
         socialJetLagWarning: false,
       });
       expect(result.value.anchorDate).toBeInstanceOf(Date);
-      expect(result.value.totalDurationMinutes).toBeGreaterThanOrEqual(23 * 60);
-      expect(result.value.totalDurationMinutes).toBeLessThanOrEqual(25 * 60);
+      // 仕様: docs/spec/day-duration.md#受入基準 A-6(範囲検査ではなく具体値。24時間 = 1440分)
+      expect(result.value.totalDurationMinutes).toBe(1440);
       expect(result.value.blocks).toHaveLength(7);
       expect(result.value.blocks[0]).toMatchObject({
         blockId: expect.any(String),

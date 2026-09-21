@@ -113,4 +113,20 @@ describe("GetDailyTimelineUseCase", () => {
       ]);
     }
   });
+
+  it("標準シナリオで totalDurationMinutes が blocks の合計と一致し 1440 になる (A-4)", async () => {
+    // 仕様: docs/spec/day-duration.md#受入基準 A-4
+    const standardDate = new Date("2026-06-21T20:30:00");
+    const repo = createFakeTimelineRepository({ targetDate: standardDate });
+
+    const result = await createUseCase(repo).execute({ targetDate: standardDate });
+
+    expect(result.isOk).toBe(true);
+    if (result.isOk) {
+      const sum = result.value.blocks.reduce((acc, b) => acc + b.durationMinutes, 0);
+      expect(result.value.totalDurationMinutes).toBe(sum);
+      expect(result.value.totalDurationMinutes).toBe(1440);
+      expect(result.value.totalDurationMinutes).not.toBe(1380);
+    }
+  });
 });
